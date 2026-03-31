@@ -11,6 +11,7 @@ import { ScreenShake } from '../effects/ScreenShake';
 import { SlowMotion } from '../effects/SlowMotion';
 import { ScreenFlash } from '../effects/ScreenFlash';
 import { TextPopup } from '../effects/TextPopup';
+import { Haptics } from '../effects/Haptics';
 import { ScoreDisplay } from '../ui/ScoreDisplay';
 import { StartScreen } from '../ui/StartScreen';
 import { DeathScreen } from '../ui/DeathScreen';
@@ -39,6 +40,7 @@ export class Game {
   private slowMo: SlowMotion;
   private flash: ScreenFlash;
   private textPopup: TextPopup;
+  private haptics: Haptics;
   private scoreDisplay: ScoreDisplay;
   private startScreen: StartScreen;
   private deathScreen: DeathScreen;
@@ -89,6 +91,7 @@ export class Game {
     this.shake = new ScreenShake(this.worldContainer);
     this.slowMo = new SlowMotion();
     this.flash = new ScreenFlash();
+    this.haptics = new Haptics();
     this.uiContainer.addChild(this.flash);
 
     // UI
@@ -157,12 +160,14 @@ export class Game {
         this.bird.reset();
         this.bird.flap();
         this.emitFlapParticles();
+        this.haptics.flap();
         this.pipes.reset();
         this.scoreValue = 0;
         break;
       case 'playing':
         this.bird.flap();
         this.emitFlapParticles();
+        this.haptics.flap();
         break;
       case 'dead':
         this.restart();
@@ -239,6 +244,8 @@ export class Game {
     this.flash.trigger();
     this.shake.trigger(DEATH_SHAKE_MS, 6);
 
+    this.haptics.death();
+
     // Death explosion particles
     this.particles.burst(this.bird.x, this.bird.y, DEATH_PARTICLES, {
       speed: 300,
@@ -268,11 +275,13 @@ export class Game {
   private onScore() {
     this.scoreValue++;
     this.scoreDisplay.setScore(this.scoreValue);
+    this.haptics.score();
   }
 
   private onNearMiss(x: number, y: number) {
     this.slowMo.trigger();
     this.textPopup.trigger(x, y);
+    this.haptics.nearMiss();
   }
 
   private emitFlapParticles() {
