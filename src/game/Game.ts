@@ -281,7 +281,6 @@ export class Game {
   private onNearMiss(x: number, y: number) {
     this.slowMo.trigger();
     this.textPopup.trigger(x, y);
-    this.haptics.nearMiss();
   }
 
   private emitFlapParticles() {
